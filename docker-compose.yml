@@ -1,0 +1,38 @@
+services:
+  migrate:
+    build: .
+    container_name: 'migrate'
+    command: >
+      /bin/sh -c "python3 manage.py migrate --force-color -v 3; exit 0"
+    volumes:
+      - .:/workdir
+  api:
+    build: .
+    command: python manage.py runserver 0.0.0.0:5000
+    volumes:
+      - .:/workdir
+    ports:
+      - "5000:5000"
+    depends_on:
+      - migrate
+  test:
+    build: .
+    container_name: 'test'
+    command: >
+      /bin/sh -c "python3 manage.py test --force-color -v 3; exit 0"
+    volumes:
+      - .:/workdir
+  test-unit:
+    build: .
+    container_name: 'test-unit'
+    command: >
+      /bin/sh -c "python3 manage.py test --tag=unit --force-color -v 3; exit 0"
+    volumes:
+      - .:/workdir
+  test-integration:
+    build: .
+    container_name: 'test-integration'
+    command: >
+      /bin/sh -c "python3 manage.py test --tag=integration --force-color -v 3; exit 0"
+    volumes:
+      - .:/workdir
